@@ -17,7 +17,7 @@ A FastAPI-based API for classifying aviation-related text using hierarchical cla
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone [<repository-url>](https://github.com/Ramshankar07/aviation-classifier-v2.git)
 cd aviation-classifier-v2
 ```
 
@@ -164,7 +164,3 @@ aviation-classifier-v2/
 - Uvicorn: ASGI server
 - Pandas: Data manipulation
 - NumPy: Numerical computations
-
-## License
-
-[Your License] 
