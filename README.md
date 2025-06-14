@@ -2,7 +2,6 @@
 
 [![Python Version](https://img.shields.io/badge/python-3.8%2B-blue)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.100.0-green)](https://fastapi.tiangolo.com/)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 A powerful FastAPI-based API for hierarchical classification of aviation-related text using LangChain and Together AI. This system provides detailed classification of aviation incidents, maintenance issues, and operational events through multiple hierarchical levels.
 
