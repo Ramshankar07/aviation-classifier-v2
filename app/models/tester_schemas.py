@@ -18,4 +18,16 @@ class AccuracyMetrics(BaseModel):
 class TestSummary(BaseModel):
     accuracy_metrics: AccuracyMetrics
     results_file: str
-    report_file: str 
+    report_file: str
+
+class TestResult(BaseModel):
+    log_notes: str
+    expected: Dict[str, str]
+    predicted: Dict[str, str]
+    is_correct: bool
+
+class TestMetrics(BaseModel):
+    total_tests: int
+    correct_classifications: int
+    accuracy: float
+    level_accuracy: Dict[str, float] 

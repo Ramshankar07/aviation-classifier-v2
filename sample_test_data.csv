@@ -1,0 +1,6 @@
+Log Notes,Department,Category,Sub Category,Operational Element (Issue/Condition/Cause/Activity),Status,Operational Trigger,Location Type,Location
+"Gate 15 jetbridge malfunction causing boarding delays",Infrastructure,Building Operations and Maintenance,Bridges/Gates,Jetbridge,Malfunction,Equipment Failure,Gate,Gate 15
+"Aircraft arrival at Gate 2 delayed due to weather conditions",Operations,Airport Operations,Operational Updates,Aircraft,Delayed,Weather,Gate,Gate 2
+"Terminal 1 HVAC system maintenance scheduled for next week",Infrastructure,Building Operations and Maintenance,Airport Facility Activities,HVAC System,Scheduled,Scheduled Maintenance,Terminal,Terminal 1
+"Security checkpoint queue backup due to equipment failure",Security,Airport Security,Preboard Screening (PBS),Security Equipment,Malfunction,Equipment Failure,Terminal,Terminal 1
+"Runway 09/27 closed for scheduled maintenance",Infrastructure,Field Maintenance,Surface Cleaning (Rubber Removal, Hydroblasting),Runway,Closed,Scheduled Maintenance,Runway,Runway 09/27 

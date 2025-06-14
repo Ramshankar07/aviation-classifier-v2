@@ -1,30 +1,55 @@
-# Aviation Classifier API
+# Aviation Classifier API 🛩️
 
-A FastAPI-based API for classifying aviation-related text using hierarchical classification with LangChain and Together AI.
+[![Python Version](https://img.shields.io/badge/python-3.8%2B-blue)](https://www.python.org/downloads/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.100.0-green)](https://fastapi.tiangolo.com/)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-## Features
+A powerful FastAPI-based API for hierarchical classification of aviation-related text using LangChain and Together AI. This system provides detailed classification of aviation incidents, maintenance issues, and operational events through multiple hierarchical levels.
 
-- Hierarchical classification of aviation-related text
-- Department, Category, and Subcategory classification
-- Operational details classification
-- FastAPI-based REST API
-- LangChain integration with Together AI
-- ChromaDB vector store for semantic search
-- CSV-based testing and evaluation
-- Detailed accuracy reports and metrics
+## ✨ Features
 
-## Setup
+- **Hierarchical Classification**: Multi-level classification system for aviation text
+  - Department → Category → Subcategory
+  - Operational details (Entity, Status, Trigger)
+  - Location information (Type and specific Location)
+- **Advanced AI Integration**
+  - LangChain framework for robust LLM applications
+  - Together AI for high-performance language models
+  - ChromaDB vector store for efficient semantic search
+- **Comprehensive Testing**
+  - CSV-based test suite
+  - Detailed accuracy metrics and reports
+  - Performance benchmarking
+- **Developer-Friendly**
+  - RESTful API with OpenAPI documentation
+  - Easy-to-use endpoints
+  - Comprehensive error handling
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Python 3.8 or higher
+- pip (Python package manager)
+- Git
+
+### Installation
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone https://github.com/Ramshankar07/aviation-classifier-v2.git
 cd aviation-classifier-v2
 ```
 
-2. Create a virtual environment and activate it:
+2. Create and activate a virtual environment:
 ```bash
+# Windows
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+venv\Scripts\activate
+
+# Linux/MacOS
+python -m venv venv
+source venv/bin/activate
 ```
 
 3. Install dependencies:
@@ -32,7 +57,8 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-4. Create a `.env` file in the root directory with your configuration:
+4. Configure environment variables:
+Create a `.env` file in the root directory:
 ```env
 TOGETHER_API_KEY=your_together_api_key
 VECTORSTORE_PATH=./vectorstore
@@ -41,7 +67,7 @@ TEMPERATURE=0.1
 MAX_TOKENS=500
 ```
 
-## Running the API
+## 🏃‍♂️ Running the API
 
 1. Start the FastAPI server:
 ```bash
@@ -52,7 +78,7 @@ uvicorn main:app --reload
 - Swagger UI: http://localhost:8000/docs
 - ReDoc: http://localhost:8000/redoc
 
-## API Usage
+## 📚 API Usage
 
 ### Classify Text
 
@@ -87,39 +113,13 @@ curl -X POST "http://localhost:8000/api/v1/test" \
      }'
 ```
 
-Response:
-```json
-{
-    "success": true,
-    "message": "Test completed successfully",
-    "summary": {
-        "overall_accuracy": {
-            "Department": 85.5,
-            "Category": 82.3,
-            "Sub_Category": 78.9,
-            "Operational_Entity": 80.1,
-            "Status": 83.4,
-            "Operational_Trigger": 79.8,
-            "Location_Type": 81.2,
-            "Location": 84.5,
-            "Overall": 75.6
-        },
-        "summary_stats": {
-            "mean_accuracy": 81.4,
-            "std_accuracy": 2.8,
-            "min_accuracy": 75.6,
-            "max_accuracy": 85.5
-        },
-        "total_entries": 100
-    }
-}
-```
+## 📊 Test Results Format
 
 The test results will be saved in the `test_results` directory:
 - `results_[timestamp].csv`: Detailed classification results
 - `report_[timestamp].txt`: Detailed accuracy report
 
-## CSV Test File Format
+### CSV Test File Format
 
 The test CSV file should have the following columns:
 - `Log Notes`: The text to classify
@@ -132,28 +132,45 @@ The test CSV file should have the following columns:
 - `Location Type`: Actual location type
 - `Location`: Actual location
 
-## Project Structure
+## 🏗️ Project Structure
 
 ```
 aviation-classifier-v2/
 ├── app/
 │   ├── api/
-│   │   └── routes.py
+│   │   └── routes.py          # API endpoints
 │   ├── core/
-│   │   └── llm.py
+│   │   └── llm.py            # LLM configuration
 │   ├── models/
-│   │   ├── schemas.py
-│   │   └── tester_schemas.py
+│   │   ├── schemas.py        # Pydantic models
+│   │   └── tester_schemas.py # Test schemas
 │   ├── services/
-│   │   ├── classifier.py
-│   │   └── tester.py
-│   └── config.py
-├── main.py
-├── requirements.txt
-└── README.md
+│   │   ├── classifier.py     # Classification logic
+│   │   └── tester.py         # Testing utilities
+│   └── config.py             # App configuration
+├── main.py                   # Application entry point
+├── requirements.txt          # Project dependencies
+└── README.md                 # Project documentation
 ```
 
-## Dependencies
+## 🔧 Troubleshooting
+
+### Common Issues
+
+1. **API Key Issues**
+   - Ensure your Together AI API key is correctly set in the `.env` file
+   - Check if the API key has sufficient permissions
+
+2. **Vector Store Errors**
+   - Verify the `VECTORSTORE_PATH` exists and is writable
+   - Clear the vector store directory if corrupted
+
+3. **Model Loading Issues**
+   - Confirm the model name is correct in `.env`
+   - Check internet connection for model download
+
+
+## 📦 Dependencies
 
 - FastAPI: Web framework
 - LangChain: Framework for LLM applications
@@ -164,7 +181,4 @@ aviation-classifier-v2/
 - Uvicorn: ASGI server
 - Pandas: Data manipulation
 - NumPy: Numerical computations
-
-## License
-
-[Your License] 
+ 
