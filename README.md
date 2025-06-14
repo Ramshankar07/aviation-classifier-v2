@@ -2,7 +2,6 @@
 
 [![Python Version](https://img.shields.io/badge/python-3.8%2B-blue)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.100.0-green)](https://fastapi.tiangolo.com/)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 A powerful FastAPI-based API for hierarchical classification of aviation-related text using LangChain and Together AI. This system provides detailed classification of aviation incidents, maintenance issues, and operational events through multiple hierarchical levels.
 
@@ -65,6 +64,41 @@ VECTORSTORE_PATH=./vectorstore
 MODEL_NAME=Qwen/Qwen2.5-7B-Instruct-Turbo
 TEMPERATURE=0.1
 MAX_TOKENS=500
+```
+
+### Setting Up the Classifier
+
+1. The project includes a sample classification tree in `sample_classification_tree.csv`. This file contains:
+   - Department (Level 1)
+   - Category (Level 2)
+   - Subcategory (Level 3)
+   - Operational Entities
+   - Statuses
+   - Triggers
+   - Location Types
+   - Locations
+
+2. Use the provided `setup_classifier.py` script to initialize the classifier:
+```bash
+python setup_classifier.py
+```
+
+3. The script will:
+   - Initialize the LangChainHierarchicalClassifier
+   - Load the classification tree from the CSV
+   - Set up the classifier with the tree
+   - Run a test classification
+
+4. You can modify `sample_classification_tree.csv` to add more:
+   - Departments (e.g., Infrastructure, Security, Safety)
+   - Categories (e.g., Building Operations, Security Screening)
+   - Subcategories (e.g., Gate Assignment, Security Checks)
+   - Operational details and locations
+
+Example of adding a new classification:
+```csv
+Index,Level_1,Level_2,Level_3,Operational_Entities,Statuses,Triggers,Location_Types,Locations
+1,Infrastructure,Building Operations,Gate Assignment,Jetbridge,Malfunction,Equipment Failure,Gate,Gate 15
 ```
 
 ## 🏃‍♂️ Running the API
@@ -150,6 +184,8 @@ aviation-classifier-v2/
 │   └── config.py             # App configuration
 ├── main.py                   # Application entry point
 ├── requirements.txt          # Project dependencies
+├── sample_classification_tree.csv  # Sample classification data
+├── setup_classifier.py       # Classifier setup script
 └── README.md                 # Project documentation
 ```
 
@@ -169,6 +205,10 @@ aviation-classifier-v2/
    - Confirm the model name is correct in `.env`
    - Check internet connection for model download
 
+4. **Classification Tree Issues**
+   - Ensure the CSV file follows the correct format
+   - Check for any missing or malformed data in the CSV
+   - Verify the classification tree is properly loaded
 
 ## 📦 Dependencies
 
