@@ -1,22 +1,113 @@
 import pandas as pd
 import asyncio
 import json
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 from collections import defaultdict
 import numpy as np
 from datetime import datetime
 from app.services.classifier import LangChainHierarchicalClassifier
+from app.core.classifier import LangChainHierarchicalClassifier
+from app.models.tester_schemas import TestResult, TestMetrics
 
 class CSVClassifierTester:
-    def __init__(self, classifier: LangChainHierarchicalClassifier, csv_file_path: str):
-        """
-        Initialize the CSV tester with classifier and CSV file path
-        """
+    def __init__(self, classifier: LangChainHierarchicalClassifier):
         self.classifier = classifier
-        self.csv_file_path = csv_file_path
-        self.df = None
-        self.results = []
-        self.accuracy_metrics = {}
+
+    async def run_tests(self, csv_path: str) -> List[TestResult]:
+        """
+        Run classification tests on entries from a CSV file
+        
+        Args:
+            csv_path: Path to CSV file containing test data
+            
+        Returns:
+            List of TestResult objects containing test results
+        """
+        try:
+            df = pd.read_csv(csv_path)
+            results = []
+            
+            for _, row in df.iterrows():
+                log_notes = row['Log Notes']
+                expected = {
+                    'department': row['Department'],
+                    'category': row['Category'],
+                    'sub_category': row['Sub Category'],
+                    'operational_element': row['Operational Element (Issue/Condition/Cause/Activity)'],
+                    'status': row['Status'],
+                    'operational_trigger': row['Operational Trigger'],
+                    'location_type': row['Location Type'],
+                    'location': row['Location']
+                }
+                
+                # Get classifier prediction
+                prediction = await self.classifier.classify(log_notes)
+                
+                # Create test result
+                result = TestResult(
+                    log_notes=log_notes,
+                    expected=expected,
+                    predicted=prediction,
+                    is_correct=self._compare_predictions(expected, prediction)
+                )
+                results.append(result)
+                
+            return results
+            
+        except Exception as e:
+            print(f"Error running tests: {e}")
+            return []
+
+    def calculate_metrics(self, results: List[TestResult]) -> TestMetrics:
+        """
+        Calculate accuracy metrics from test results
+        
+        Args:
+            results: List of TestResult objects
+            
+        Returns:
+            TestMetrics object containing accuracy metrics
+        """
+        if not results:
+            return TestMetrics(
+                total_tests=0,
+                correct_classifications=0,
+                accuracy=0.0,
+                level_accuracy={}
+            )
+            
+        total_tests = len(results)
+        correct_classifications = sum(1 for r in results if r.is_correct)
+        overall_accuracy = correct_classifications / total_tests
+        
+        # Calculate level-wise accuracy
+        level_accuracy = {}
+        levels = ['department', 'category', 'sub_category', 'operational_element',
+                 'status', 'operational_trigger', 'location_type', 'location']
+                 
+        for level in levels:
+            correct = sum(1 for r in results if r.expected[level] == r.predicted[level])
+            level_accuracy[level] = correct / total_tests
+            
+        return TestMetrics(
+            total_tests=total_tests,
+            correct_classifications=correct_classifications,
+            accuracy=overall_accuracy,
+            level_accuracy=level_accuracy
+        )
+
+    def _compare_predictions(self, expected: Dict[str, str], predicted: Dict[str, str]) -> bool:
+        """
+        Compare expected and predicted classifications
+        
+        Args:
+            expected: Dictionary of expected classifications
+            predicted: Dictionary of predicted classifications
+            
+        Returns:
+            True if all classifications match, False otherwise
+        """
+        return all(expected[level] == predicted[level] for level in expected.keys())
 
     def load_csv(self):
         """Load the CSV file"""
