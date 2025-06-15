@@ -1,5 +1,5 @@
 import json
-from typing import Dict, List
+from typing import Dict, List, Any
 from pathlib import Path
 
 from langchain.chains import RetrievalQA
@@ -13,7 +13,14 @@ from app.config import get_settings
 settings = get_settings()
 
 class LangChainHierarchicalClassifier:
-    def __init__(self):
+    def __init__(self, classification_tree: Dict[str, Any] = None):
+        """
+        Initialize the hierarchical classifier
+        
+        Args:
+            classification_tree: Optional dictionary containing the hierarchical classification structure
+        """
+        self.classification_tree = classification_tree or {}
         # Initialize LLM
         self.llm = TogetherLLM()
 
@@ -28,14 +35,8 @@ class LangChainHierarchicalClassifier:
             embedding_function=self.embeddings
         )
 
-        # Classification tree (to be set externally)
-        self.classification_tree = None
-
         # Initialize RetrievalQA chains for each level
         self._setup_qa_chains()
-
-    def set_classification_tree(self, classification_tree: Dict):
-        self.classification_tree = classification_tree
 
     def _setup_qa_chains(self):
         """Setup RetrievalQA chains for each classification level"""
@@ -200,7 +201,7 @@ JSON:""",
         """Level 2: Classify Category using RetrievalQA"""
         available_categories = self.get_categories_for_department(department)
         if not available_categories:
-            return "Unknown"
+            return "NA"
 
         try:
             query_with_context = f"Input to classify: {input_text}\nDepartment: {department}\nAvailable categories: {available_categories}"
@@ -220,7 +221,7 @@ JSON:""",
         """Level 3: Classify Subcategory using RetrievalQA"""
         available_subcategories = self.get_subcategories_for_category(department, category)
         if not available_subcategories:
-            return "Unknown"
+            return "NA"
 
         try:
             query_with_context = f"Input to classify: {input_text}\nDepartment: {department}\nCategory: {category}\nAvailable subcategories: {available_subcategories}"
@@ -264,35 +265,43 @@ JSON:""",
                             validated_result[field] = option
                             break
                     else:
-                        validated_result[field] = options[0] if options else "Unknown"
+                        validated_result[field] = options[0] if options else "NA"
 
                 return validated_result
 
             except json.JSONDecodeError:
                 return {
-                    "Operational Entity": operational_options['operational_entities'][0] if operational_options['operational_entities'] else "Unknown",
-                    "Status": operational_options['statuses'][0] if operational_options['statuses'] else "Unknown",
-                    "Operational Trigger": operational_options['triggers'][0] if operational_options['triggers'] else "Unknown",
-                    "Location Type": operational_options['location_types'][0] if operational_options['location_types'] else "Unknown",
-                    "Location": operational_options['locations'][0] if operational_options['locations'] else "Unknown"
+                    "Operational Entity": operational_options['operational_entities'][0] if operational_options['operational_entities'] else "NA",
+                    "Status": operational_options['statuses'][0] if operational_options['statuses'] else "NA",
+                    "Operational Trigger": operational_options['triggers'][0] if operational_options['triggers'] else "NA",
+                    "Location Type": operational_options['location_types'][0] if operational_options['location_types'] else "NA",
+                    "Location": operational_options['locations'][0] if operational_options['locations'] else "NA"
                 }
 
         except Exception as e:
             print(f"Error in final classification: {e}")
             return {
-                "Operational Entity": operational_options['operational_entities'][0] if operational_options['operational_entities'] else "Unknown",
-                "Status": operational_options['statuses'][0] if operational_options['statuses'] else "Unknown",
-                "Operational Trigger": operational_options['triggers'][0] if operational_options['triggers'] else "Unknown",
-                "Location Type": operational_options['location_types'][0] if operational_options['location_types'] else "Unknown",
-                "Location": operational_options['locations'][0] if operational_options['locations'] else "Unknown"
+                "Operational Entity": operational_options['operational_entities'][0] if operational_options['operational_entities'] else "NA",
+                "Status": operational_options['statuses'][0] if operational_options['statuses'] else "NA",
+                "Operational Trigger": operational_options['triggers'][0] if operational_options['triggers'] else "NA",
+                "Location Type": operational_options['location_types'][0] if operational_options['location_types'] else "NA",
+                "Location": operational_options['locations'][0] if operational_options['locations'] else "NA"
             }
 
-    def classify(self, input_text: str) -> Dict[str, str]:
-        """Main classification method"""
-        department = self.classify_department(input_text)
-        category = self.classify_category(input_text, department)
-        subcategory = self.classify_subcategory(input_text, department, category)
-        final_details = self.classify_final_details(input_text, department, category, subcategory)
+    async def classify(self, text: str) -> Dict[str, str]:
+        """
+        Classify the input text using the hierarchical structure
+        
+        Args:
+            text: Input text to classify
+            
+        Returns:
+            Dictionary containing classification results for each level
+        """
+        department = self.classify_department(text)
+        category = self.classify_category(text, department)
+        subcategory = self.classify_subcategory(text, department, category)
+        final_details = self.classify_final_details(text, department, category, subcategory)
 
         return {
             "Department": department,

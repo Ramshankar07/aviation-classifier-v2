@@ -6,12 +6,17 @@ from app.services.tester import CSVClassifierTester
 from app.config import get_settings
 import os
 from datetime import datetime
+from app.core.tree_extractor import extract_classification_tree_from_csv
 
 router = APIRouter()
 settings = get_settings()
 
-# Initialize classifier
-classifier = LangChainHierarchicalClassifier()
+# Load classification tree
+categories_csv = "Categories Combinations(Sheet1).csv"
+classification_tree = extract_classification_tree_from_csv(categories_csv)
+
+# Initialize classifier with the tree
+classifier = LangChainHierarchicalClassifier(classification_tree=classification_tree)
 
 @router.post(
     "/classify",

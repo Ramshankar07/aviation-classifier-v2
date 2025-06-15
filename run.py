@@ -1,23 +1,18 @@
 import asyncio
 import json
 from pathlib import Path
-from app.core.classifier import LangChainHierarchicalClassifier
+from app.services.classifier import LangChainHierarchicalClassifier
 from app.services.tester import CSVClassifierTester
 from app.core.tree_extractor import extract_classification_tree_from_csv
 
 async def main():
     try:
-        # Load classification tree from CSV
-        tree_path = Path("Categories Combinations(Sheet1).csv")
-        if not tree_path.exists():
-            raise FileNotFoundError(f"Classification tree CSV not found at {tree_path}")
+        # Load classification tree
+        categories_csv = "Categories Combinations(Sheet1).csv"
+        classification_tree = extract_classification_tree_from_csv(categories_csv)
         
-        classification_tree = extract_classification_tree_from_csv(str(tree_path))
-        if not classification_tree:
-            raise ValueError("Failed to extract classification tree from CSV")
-
-        # Initialize classifier
-        classifier = LangChainHierarchicalClassifier(classification_tree)
+        # Initialize classifier with the tree
+        classifier = LangChainHierarchicalClassifier(classification_tree=classification_tree)
         
         # Initialize tester
         tester = CSVClassifierTester(classifier)

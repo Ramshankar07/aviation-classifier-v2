@@ -6,12 +6,15 @@ from collections import defaultdict
 import numpy as np
 from datetime import datetime
 from app.services.classifier import LangChainHierarchicalClassifier
-from app.core.classifier import LangChainHierarchicalClassifier
 from app.models.tester_schemas import TestResult, TestMetrics
 
 class CSVClassifierTester:
     def __init__(self, classifier: LangChainHierarchicalClassifier):
         self.classifier = classifier
+        self.results = []
+        self.accuracy_metrics = None
+        self.df = None
+        self.csv_file_path = None
 
     async def run_tests(self, csv_path: str) -> List[TestResult]:
         """
@@ -361,4 +364,59 @@ class CSVClassifierTester:
             "total_entries": self.accuracy_metrics['total_entries']
         }
 
-        return summary 
+        return summary
+
+    async def process_live_notes(self, input_csv_path: str, output_csv_path: str):
+        """
+        Process live notes from CSV and save results
+        
+        Args:
+            input_csv_path: Path to input CSV containing live notes
+            output_csv_path: Path to save processed results
+        """
+        try:
+            # Load and preprocess data
+            self.csv_file_path = input_csv_path
+            if not self.load_csv() or not self.preprocess_data():
+                return False
+
+            print(f"Processing {len(self.df)} live notes...")
+            
+            # Process each entry
+            for index, row in self.df.iterrows():
+                log_note = row['Log Notes']
+                
+                # Get prediction from classifier
+                predicted = await self.classifier.classify(log_note)
+                
+                # Create result entry
+                result_entry = {
+                    'Index': index,
+                    'Log_Notes': log_note,
+                    'Predicted_Department': predicted.get('Department', 'N/A'),
+                    'Predicted_Category': predicted.get('Category', 'N/A'),
+                    'Predicted_Sub_Category': predicted.get('Sub Category', 'N/A'),
+                    'Predicted_Operational_Entity': predicted.get('Operational Entity', 'N/A'),
+                    'Predicted_Status': predicted.get('Status', 'N/A'),
+                    'Predicted_Operational_Trigger': predicted.get('Operational Trigger', 'N/A'),
+                    'Predicted_Location_Type': predicted.get('Location Type', 'N/A'),
+                    'Predicted_Location': predicted.get('Location', 'N/A'),
+                    'Processing_Time': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                }
+                
+                self.results.append(result_entry)
+                
+                # Print progress
+                if (index + 1) % 10 == 0:
+                    print(f"Processed {index + 1}/{len(self.df)} entries...")
+            
+            # Save results
+            results_df = pd.DataFrame(self.results)
+            results_df.to_csv(output_csv_path, index=False)
+            print(f"Results saved to {output_csv_path}")
+            
+            return True
+            
+        except Exception as e:
+            print(f"Error processing live notes: {e}")
+            return False 
